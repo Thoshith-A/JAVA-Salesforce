@@ -1,44 +1,75 @@
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 function AuditLog({ events }) {
   const scrollContainerRef = useRef(null)
-  const isUserScrollingRef = useRef(false)
   const prevCountRef = useRef(0)
+  const lastScrollTopRef = useRef(0)
+  const lastScrollHeightRef = useRef(0)
+  const hasInitializedRef = useRef(false)
   const [showNewPill, setShowNewPill] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
 
   const onScroll = () => {
     const el = scrollContainerRef.current
     if (!el) return
-    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 48
-    isUserScrollingRef.current = !isAtBottom
-    if (isAtBottom) {
+    lastScrollTopRef.current = el.scrollTop
+    lastScrollHeightRef.current = el.scrollHeight
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    if (distanceFromBottom < 8) {
       setShowNewPill(false)
+      setPendingCount(0)
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = scrollContainerRef.current
     if (!el) return
-    const hasNewEvents = events.length > prevCountRef.current
-    prevCountRef.current = events.length
-    if (!hasNewEvents) return
 
-    if (!isUserScrollingRef.current) {
-      // Keep updates local to this container and avoid smooth animation,
-      // which can trigger perceived page pull on some browsers.
-      el.scrollTop = el.scrollHeight
+    const hasNewEvents = events.length > prevCountRef.current
+    const newItems = hasNewEvents ? events.length - prevCountRef.current : 0
+    const previousScrollHeight = lastScrollHeightRef.current || el.scrollHeight
+    const previousScrollTop = lastScrollTopRef.current || el.scrollTop
+    prevCountRef.current = events.length
+
+    // First render: just snapshot sizes, no scroll movement.
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true
+      lastScrollHeightRef.current = el.scrollHeight
+      lastScrollTopRef.current = el.scrollTop
+      return
+    }
+
+    if (!hasNewEvents) {
+      lastScrollHeightRef.current = el.scrollHeight
+      lastScrollTopRef.current = el.scrollTop
+      return
+    }
+
+    // ABSOLUTELY NO AUTO-SCROLL. We only lock the user's visible pixel offset
+    // so new items being appended below never shift what they are reading.
+    // Items are appended to the bottom, so scrollTop does not need to change,
+    // but we re-assert it defensively to neutralize any browser scroll anchoring.
+    el.scrollTop = previousScrollTop
+
+    setShowNewPill(true)
+    setPendingCount((count) => count + newItems)
+
+    lastScrollHeightRef.current = el.scrollHeight
+    lastScrollTopRef.current = el.scrollTop
+    // Suppress pill if user happens to already be at bottom.
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    if (distanceFromBottom < 8) {
       setShowNewPill(false)
-    } else {
-      setShowNewPill(true)
+      setPendingCount(0)
     }
   }, [events])
 
   const jumpToLatest = () => {
     const el = scrollContainerRef.current
     if (!el) return
-    isUserScrollingRef.current = false
     setShowNewPill(false)
+    setPendingCount(0)
     el.scrollTop = el.scrollHeight
   }
 
@@ -55,18 +86,15 @@ function AuditLog({ events }) {
         <div
           ref={scrollContainerRef}
           onScroll={onScroll}
-          onWheel={(e) => e.stopPropagation()}
-          onWheelCapture={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          onTouchMoveCapture={(e) => e.stopPropagation()}
           className="terminal-body scanline-overlay audit-scroll space-y-2 text-xs font-mono p-3"
         >
           <AnimatePresence initial={false}>
             {events.map((event, idx) => (
               <motion.div
-                key={`${event.poll}-${event.roundId}-${idx}`}
-                initial={{ opacity: 0, y: 8 }}
+                key={`${event.poll}-${event.roundId}-${event.participant}-${event.score}-${event.duplicate}-${event.emittedAt ?? idx}`}
+                initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.15 }}
                 className="border border-[#1e2b3a] rounded p-2 bg-black/50"
               >
                 <div className="text-[#8fa0b8]">
@@ -91,7 +119,7 @@ function AuditLog({ events }) {
             className="new-events-pill"
             onClick={jumpToLatest}
           >
-            ↓ New events
+            ↓ New events {pendingCount > 0 ? `(${pendingCount})` : ''}
           </motion.button>
         )}
       </AnimatePresence>

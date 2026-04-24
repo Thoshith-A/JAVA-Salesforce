@@ -18,14 +18,22 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   overflow-x: hidden;
+  overflow-anchor: none;
+}
+
+html, body, #root {
   overflow-anchor: none;
 }
 
 body {
   overflow-x: hidden;
   overflow-anchor: none;
+}
+
+*, *::before, *::after {
+  scroll-behavior: auto;
 }
 
 ::selection {
