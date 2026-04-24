@@ -1,0 +1,31 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/node/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Env / Secrets
+.env
+.env.local
+*.env
+application-local.yml
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/

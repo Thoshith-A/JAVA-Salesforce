@@ -1,0 +1,7 @@
+services:
+  quiz-leaderboard:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - REG_NO=${REG_NO}

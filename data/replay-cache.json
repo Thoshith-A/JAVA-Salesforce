@@ -1,0 +1,76 @@
+{
+  "regNo" : "1",
+  "cachedAt" : 1777039083.991208000,
+  "polls" : {
+    "0" : [ {
+      "roundId" : "R1",
+      "participant" : "Diana",
+      "score" : 200
+    }, {
+      "roundId" : "R1",
+      "participant" : "Ethan",
+      "score" : 155
+    } ],
+    "1" : [ {
+      "roundId" : "R1",
+      "participant" : "Fiona",
+      "score" : 180
+    } ],
+    "2" : [ {
+      "roundId" : "R2",
+      "participant" : "Diana",
+      "score" : 95
+    }, {
+      "roundId" : "R2",
+      "participant" : "Ethan",
+      "score" : 210
+    } ],
+    "3" : [ {
+      "roundId" : "R2",
+      "participant" : "Diana",
+      "score" : 95
+    } ],
+    "4" : [ {
+      "roundId" : "R3",
+      "participant" : "Fiona",
+      "score" : 140
+    }, {
+      "roundId" : "R3",
+      "participant" : "Diana",
+      "score" : 175
+    } ],
+    "5" : [ {
+      "roundId" : "R2",
+      "participant" : "Fiona",
+      "score" : 120
+    } ],
+    "6" : [ {
+      "roundId" : "R3",
+      "participant" : "Ethan",
+      "score" : 90
+    }, {
+      "roundId" : "R1",
+      "participant" : "Diana",
+      "score" : 200
+    } ],
+    "7" : [ {
+      "roundId" : "R3",
+      "participant" : "Fiona",
+      "score" : 140
+    } ],
+    "8" : [ {
+      "roundId" : "R2",
+      "participant" : "Ethan",
+      "score" : 210
+    }, {
+      "roundId" : "R3",
+      "participant" : "Diana",
+      "score" : 175
+    } ],
+    "9" : [ {
+      "roundId" : "R1",
+      "participant" : "Fiona",
+      "score" : 180
+    } ]
+  }
+}
