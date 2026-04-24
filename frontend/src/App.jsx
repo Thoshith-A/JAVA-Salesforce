@@ -13,6 +13,9 @@ import SpectatePage from './pages/SpectatePage'
 import { useSSE } from './hooks/useSSE'
 import { useSpectator } from './hooks/useSpectator'
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '')
+const apiUrl = (path) => `${API_BASE}${path}`
+
 const defaultPolls = Array.from({ length: 10 }, (_, poll) => ({
   poll,
   status: 'idle',
@@ -56,7 +59,7 @@ function DashboardPage() {
     setSeconds(0)
     setPolls(defaultPolls)
     const endpoint = isReplay ? '/api/quiz/replay' : '/api/quiz/run'
-    const response = await fetch(endpoint, {
+    const response = await fetch(apiUrl(endpoint), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ regNo }),
@@ -68,7 +71,7 @@ function DashboardPage() {
   useEffect(() => {
     if (!jobId) return
     const int = setInterval(async () => {
-      const response = await fetch(`/api/quiz/result?jobId=${jobId}`)
+      const response = await fetch(apiUrl(`/api/quiz/result?jobId=${encodeURIComponent(jobId)}`))
       const data = await response.json()
       if (data.leaderboardResult) {
         setResult(data.leaderboardResult)
@@ -88,7 +91,7 @@ function DashboardPage() {
   useEffect(() => {
     if (!jobId || status !== 'running') return
     const int = setInterval(async () => {
-      const response = await fetch(`/api/quiz/audit/${jobId}`)
+      const response = await fetch(apiUrl(`/api/quiz/audit/${encodeURIComponent(jobId)}`))
       const events = await response.json()
       setAudit(events)
 

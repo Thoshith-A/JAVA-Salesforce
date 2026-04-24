@@ -3,6 +3,8 @@ import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 
 const MAX_RETRIES = 3
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '')
+const WS_ENDPOINT = `${API_BASE}/ws`
 
 export function useSpectator(jobId) {
   const [leaderboard, setLeaderboard] = useState([])
@@ -28,7 +30,7 @@ export function useSpectator(jobId) {
     if (!jobId) return
     disconnect()
     const client = new Client({
-      webSocketFactory: () => new SockJS('/ws'),
+      webSocketFactory: () => new SockJS(WS_ENDPOINT),
       reconnectDelay: 0,
       onConnect: () => {
         setIsConnected(true)
